@@ -1,0 +1,1818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Multiplication Adventure – Online Math Game</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI Emoji', cursive, sans-serif;
+            background: #FFE5B4;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .game-container {
+            max-width: 1300px;
+            width: 100%;
+            background: #FFE5B4;
+            border-radius: 40px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .main-header {
+            background: #FFB347;
+            padding: 15px 20px;
+            text-align: center;
+            color: white;
+            border-bottom: 5px solid #FF8C00;
+        }
+        .main-header h1 {
+            margin: 0;
+            font-size: 2.2rem;
+        }
+        .range-panel {
+            background: #FFF0D4;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            border-bottom: 2px solid #FFD966;
+        }
+        .range-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .range-controls label {
+            font-weight: bold;
+            color: #8B4513;
+            font-size: 1rem;
+        }
+        .range-controls select {
+            font-size: 1rem;
+            padding: 5px 10px;
+            border-radius: 20px;
+            border: 1px solid #FFB347;
+            background: white;
+        }
+        .range-display {
+            font-weight: bold;
+            background: #FFE5B4;
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-size: 1rem;
+        }
+        button {
+            background: #4CAF50;
+            border: none;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+            margin: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        button:active {
+            transform: scale(0.96);
+        }
+        .btn-orange { background: #FF8C00; }
+        .btn-red { background: #FF6B6B; }
+        .btn-blue { background: #2196F3; }
+        .btn-green { background: #4CAF50; }
+        .menu-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+        .menu-buttons button {
+            font-size: 1.3rem;
+            padding: 12px 25px;
+            min-width: 200px;
+        }
+        .panel {
+            background: #FFF8E7;
+            margin: 20px;
+            padding: 20px;
+            border-radius: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: none;
+        }
+        .active-panel {
+            display: block;
+        }
+        .panel h2 {
+            text-align: center;
+        }
+        /* Quiz styles */
+        #quizPanel .quiz-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 15px 0;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .quiz-equation-card {
+            background: white;
+            border-radius: 60px;
+            padding: 50px 20px;
+            text-align: center;
+            font-size: 5rem;
+            font-weight: bold;
+            margin: 20px 0;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border: 3px solid #FFD966;
+        }
+        .quiz-equation-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .quiz-equation-row span {
+            font-size: 5rem;
+            font-weight: bold;
+        }
+        .inline-answer-input {
+            font-size: 2rem;
+            width: 150px;
+            text-align: center;
+            border-radius: 40px;
+            border: 2px solid #FFB347;
+            padding: 12px;
+            font-family: inherit;
+            -moz-appearance: textfield;
+        }
+        .inline-answer-input::-webkit-inner-spin-button,
+        .inline-answer-input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .inline-check-btn {
+            font-size: 1.2rem;
+            padding: 10px 25px;
+            background: #4CAF50;
+        }
+        .quiz-feedback-row {
+            min-height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .feedback-icon {
+            font-size: 2rem;
+            font-weight: bold;
+            transition: opacity 0.2s;
+            text-align: center;
+            line-height: 1.4;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .quiz-bottom-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid #FFD966;
+        }
+        .quiz-settings-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        .quiz-settings-row label {
+            font-size: 1rem;
+            font-weight: bold;
+            background: #FFF0D4;
+            padding: 5px 12px;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .quiz-settings-row input {
+            width: 70px;
+            font-size: 1rem;
+            padding: 5px;
+            border-radius: 20px;
+            border: 1px solid #FFB347;
+            text-align: center;
+            -moz-appearance: textfield;
+        }
+        .quiz-settings-row input::-webkit-inner-spin-button,
+        .quiz-settings-row input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .quiz-game-area {
+            display: none;
+        }
+        .quiz-game-area.active {
+            display: block;
+        }
+        .chart-footer {
+            text-align: center;
+            margin-top: 15px;
+        }
+        #resetChartBtn {
+            display: inline-block;
+        }
+        .tool-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .tool-tab {
+            background: #FFD966;
+            padding: 8px 15px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .tool-tab.active {
+            background: #FF8C00;
+            color: white;
+        }
+        .tool-content {
+            display: none;
+        }
+        .tool-content.active {
+            display: block;
+        }
+        .tool-content h3 {
+            text-align: center;
+        }
+        /* Flashcards */
+        #toolFlashcards {
+            text-align: center;
+        }
+        .flashcard-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .flashcard-card {
+            background: white;
+            border-radius: 60px;
+            padding: 50px 20px;
+            text-align: center;
+            font-size: 5rem;
+            font-weight: bold;
+            margin: 20px 0;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border: 3px solid #FFD966;
+        }
+        .flashcard-answer-area {
+            min-height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 15px 0;
+        }
+        .flashcard-answer {
+            font-size: 5rem;
+            font-weight: bold;
+            color: #2E8B57;
+            text-align: center;
+        }
+        .flashcard-select {
+            font-size: 1.2rem;
+            padding: 5px 15px;
+            border-radius: 30px;
+            border: 2px solid #FFB347;
+            background: white;
+            margin-left: 10px;
+        }
+        /* Fill in the Blank */
+        #toolFillblank {
+            text-align: center;
+        }
+        .fillblank-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .fb-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        .fb-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 15px 0;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .fill-blank-question {
+            background: white;
+            border-radius: 60px;
+            padding: 50px 20px;
+            text-align: center;
+            font-size: 5rem;
+            font-weight: bold;
+            margin: 20px 0;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border: 3px solid #FFD966;
+            word-break: break-word;
+        }
+        .fillblank-input {
+            font-size: 2rem;
+            width: 180px;
+            text-align: center;
+            border-radius: 40px;
+            border: 2px solid #FFB347;
+            padding: 12px;
+            margin: 10px auto;
+            display: block;
+            font-family: inherit;
+            -moz-appearance: textfield;
+        }
+        .fillblank-input::-webkit-inner-spin-button,
+        .fillblank-input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .fb-submit-btn {
+            display: block;
+            margin: 0 auto 15px auto;
+            background: #4CAF50;
+        }
+        .fb-feedback-row {
+            min-height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .fb-feedback-icon {
+            font-size: 2rem;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        /* Speed Drill */
+        #toolSpeeddrill {
+            text-align: center;
+        }
+        .speeddrill-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .speed-drill-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 15px 0;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        #drillQuestion {
+            background: white;
+            border-radius: 60px;
+            padding: 50px 20px;
+            text-align: center;
+            font-size: 5rem;
+            font-weight: bold;
+            margin: 20px 0;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border: 3px solid #FFD966;
+        }
+        .drill-input-area {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .drill-input-area input {
+            font-size: 2rem;
+            width: 180px;
+            text-align: center;
+            border-radius: 40px;
+            border: 2px solid #FFB347;
+            padding: 12px;
+            -moz-appearance: textfield;
+            font-family: inherit;
+        }
+        .drill-input-area input::-webkit-inner-spin-button,
+        .drill-input-area input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        #drillSubmitBtn {
+            background: #4CAF50;
+            font-size: 1.2rem;
+            padding: 10px 25px;
+        }
+        .drill-feedback-row {
+            min-height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .drill-feedback-icon {
+            font-size: 2rem;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .drill-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        /* Skip Counting */
+        #toolSkip {
+            text-align: center;
+        }
+        #skipOutput {
+            background: #FFFFE0;
+            padding: 20px;
+            border-radius: 30px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            line-height: 2.5rem;
+        }
+        .skip-select {
+            font-size: 1.2rem;
+            padding: 5px 15px;
+            border-radius: 30px;
+            border: 2px solid #FFB347;
+            background: white;
+            margin-left: 10px;
+        }
+        /* Mastery (Times Table List) */
+        #toolMastery {
+            text-align: center;
+        }
+        .mastery-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .mastery-select {
+            font-size: 1.2rem;
+            padding: 5px 15px;
+            border-radius: 30px;
+            border: 2px solid #FFB347;
+            background: white;
+            margin: 10px;
+        }
+        .mastery-list {
+            background: white;
+            border-radius: 50px;
+            padding: 30px 20px;
+            margin-top: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border: 3px solid #FFD966;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            line-height: 2.5rem;
+        }
+        /* Pattern Explorer */
+        #toolPatterns {
+            text-align: center;
+        }
+        .pattern-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .pattern-btn {
+            margin: 0;
+            display: inline-block;
+        }
+        #patternDisplay {
+            background: #FFF5EE;
+            padding: 25px;
+            border-radius: 30px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 1.6rem;
+            font-weight: bold;
+            line-height: 2.2rem;
+            color: #5a3e1b;
+        }
+        /* Custom modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #FFF0D4;
+            padding: 25px;
+            border-radius: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            font-size: 1.2rem;
+        }
+        .modal-content h2 {
+            color: #D2691E;
+            margin-top: 0;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        footer {
+            text-align: center;
+            padding: 15px;
+            background: #FFE5B4;
+            font-size: 0.8rem;
+        }
+        @media (max-width: 700px) {
+            .quiz-equation-card, .fill-blank-question, #drillQuestion { font-size: 2.5rem; padding: 30px 15px; }
+            .quiz-equation-row span { font-size: 2.5rem; }
+            .inline-answer-input, .fillblank-input, .drill-input-area input { font-size: 1.5rem; width: 130px; }
+            .quiz-stats, .fb-stats, .speed-drill-stats { flex-direction: column; gap: 10px; }
+            .fb-controls, .drill-controls { flex-direction: column; }
+            #skipOutput, .mastery-list { font-size: 1.2rem; line-height: 1.8rem; }
+            #patternDisplay { font-size: 1.2rem; line-height: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-container">
+    <div class="main-header">
+        <h1>🐘 MULTIPLICATION ADVENTURE 🦒</h1>
+        <div>⭐ Learn & Master Times Tables ⭐</div>
+    </div>
+    <div class="range-panel">
+        <div class="range-controls">
+            <label>📊 Table range up to:</label>
+            <select id="globalMaxSelect">
+                <!-- options will be populated by JS -->
+            </select>
+            <button id="applyRangeBtn" class="btn-blue">Apply</button>
+        </div>
+        <div class="range-display" id="rangeDisplay">Current: 1–12</div>
+    </div>
+
+    <div class="menu-buttons">
+        <button id="showQuizBtn" class="btn-green">🎮 PLAY QUIZ</button>
+        <button id="showMemorizeBtn" class="btn-orange">🧠 MEMORIZATION ZONE</button>
+    </div>
+
+    <!-- QUIZ PANEL -->
+    <div id="quizPanel" class="panel">
+        <h2>🎯 QUIZ MODE</h2>
+        <div class="quiz-stats">
+            <span>⭐ Score: <span id="quizScore">0</span></span>
+            <span>📋 Question: <span id="quizProgress">0</span> / <span id="totalQuestionsSpan">0</span></span>
+            <span>⏱️ Time left: <span id="timerDisplay">--</span>s</span>
+        </div>
+        
+        <div id="quizGameArea" class="quiz-game-area">
+            <div class="quiz-equation-card">
+                <div class="quiz-equation-row" id="quizEquationRow"></div>
+            </div>
+            <div class="quiz-feedback-row">
+                <div class="feedback-icon" id="feedbackIcon"></div>
+            </div>
+        </div>
+
+        <div class="quiz-bottom-bar">
+            <div class="quiz-settings-row">
+                <label>📋 Questions: <input type="number" id="quizNumQuestions" min="5" max="30" value="10"></label>
+                <label>⏱️ Seconds per Q: <input type="number" id="quizTimeLimit" min="3" max="20" value="10"></label>
+                <label>📊 Specific table (0=mixed): <input type="number" id="quizSpecificTable" min="0" max="20" value="0"></label>
+                <button id="quizApplySettings" class="btn-blue">Apply & Start</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MEMORIZATION ZONE PANEL -->
+    <div id="memorizePanel" class="panel">
+        <h2>🧠 MEMORIZATION ZONE</h2>
+        <div class="tool-tabs" id="toolTabs">
+            <div data-tool="chart" class="tool-tab active">📊 Multiplication Chart</div>
+            <div data-tool="flashcards" class="tool-tab">🃏 Flashcards</div>
+            <div data-tool="fillblank" class="tool-tab">🎯 Fill in the Blank</div>
+            <div data-tool="speeddrill" class="tool-tab">⏱️ Speed Drill</div>
+            <div data-tool="skip" class="tool-tab">🎵 Skip Counting</div>
+            <div data-tool="mastery" class="tool-tab">📚 Mastery</div>
+            <div data-tool="patterns" class="tool-tab">🔍 Pattern Explorer</div>
+        </div>
+        
+        <!-- Multiplication Chart -->
+        <div id="toolChart" class="tool-content active">
+            <h3>📊 Times Table Chart</h3>
+            <div id="chartContainer" style="overflow-x: auto;"></div>
+            <div class="chart-footer">
+                <button id="resetChartBtn">✨ Reset Highlights</button>
+            </div>
+        </div>
+
+        <!-- Flashcards -->
+        <div id="toolFlashcards" class="tool-content">
+            <h3>🃏 Flashcards</h3>
+            <div class="flashcard-container">
+                <div class="flashcard-card" id="flashcardQuestion">Click 'New Card'</div>
+                <div class="flashcard-answer-area">
+                    <div class="flashcard-answer" id="flashcardAnswer"></div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <button id="newCardBtn">🔄 New Card</button>
+                    <button id="revealAnswerBtn">🔍 Reveal Answer</button>
+                </div>
+                <div style="margin-top: 15px;">
+                    <label>Pick a table (0 = mixed):
+                        <select id="flashTableSelect" class="flashcard-select"></select>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fill in the Blank -->
+        <div id="toolFillblank" class="tool-content">
+            <h3>🎯 Fill in the Blank</h3>
+            <div class="fillblank-container">
+                <div class="fb-controls">
+                    <label>Questions:
+                        <select id="fbNumQuestions"></select>
+                    </label>
+                    <button id="fbStartBtn">Start Session</button>
+                </div>
+                <div class="fb-stats">
+                    <span>✅ Correct: <span id="fbCorrect">0</span></span>
+                    <span>❌ Wrong: <span id="fbWrong">0</span></span>
+                    <span>📝 Remaining: <span id="fbRemaining">0</span></span>
+                </div>
+                <div class="fill-blank-question" id="fbQuestion">?</div>
+                <input type="number" id="fbAnswer" class="fillblank-input" placeholder="" disabled>
+                <button id="fbCheckBtn" class="fb-submit-btn" disabled>Submit</button>
+                <div class="fb-feedback-row">
+                    <div class="fb-feedback-icon" id="fbFeedbackIcon"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Speed Drill -->
+        <div id="toolSpeeddrill" class="tool-content">
+            <h3>⏱️ Speed Drill</h3>
+            <div class="speeddrill-container">
+                <div class="drill-controls">
+                    <label>Duration (minutes):
+                        <select id="drillMinutesSelect"></select>
+                    </label>
+                    <button id="startDrillBtn">Start Drill</button>
+                </div>
+                <div class="speed-drill-stats">
+                    <span>✅ Correct: <span id="drillCorrect">0</span></span>
+                    <span>❌ Wrong: <span id="drillWrong">0</span></span>
+                    <span>⏱️ Time left: <span id="drillTimer">--:--</span></span>
+                </div>
+                <div id="drillQuestion">--</div>
+                <div id="drillInputArea" class="drill-input-area">
+                    <input type="number" id="drillAnswerInput" placeholder="" disabled>
+                    <button id="drillSubmitBtn" disabled>Submit</button>
+                </div>
+                <div class="drill-feedback-row">
+                    <div class="drill-feedback-icon" id="drillFeedbackIcon"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skip Counting -->
+        <div id="toolSkip" class="tool-content">
+            <h3>🎵 Skip Counting Rhythm</h3>
+            <label>Table:
+                <select id="skipTableSelect" class="skip-select"></select>
+            </label>
+            <div id="skipOutput" style="background:#FFFFE0; padding:20px; border-radius:30px; margin-top:20px; font-size:1.8rem; font-weight:bold; line-height:2.5rem;"></div>
+        </div>
+
+        <!-- Mastery (Times Table List) -->
+        <div id="toolMastery" class="tool-content">
+            <h3>📚 Times Table Mastery</h3>
+            <div class="mastery-container">
+                <label>Choose a table:
+                    <select id="masteryTableSelect" class="mastery-select"></select>
+                </label>
+                <div id="masteryList" class="mastery-list">
+                    <!-- Dynamic list will appear here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Pattern Explorer -->
+        <div id="toolPatterns" class="tool-content">
+            <h3>🔍 Pattern Explorer</h3>
+            <div class="pattern-buttons">
+                <button class="pattern-btn" data-pattern="nine">🤚 9's Finger Trick</button>
+                <button class="pattern-btn" data-pattern="double">✨ Doubling Trick</button>
+                <button class="pattern-btn" data-pattern="swap">🔄 Swap Trick</button>
+                <button class="pattern-btn" data-pattern="eleven">✨ 11's Magic</button>
+                <button class="pattern-btn" data-pattern="tough">✨ Tough Ones Mnemonics</button>
+            </div>
+            <div id="patternDisplay" style="background:#FFF5EE; padding:25px; border-radius:30px; margin-top:20px; font-size:1.6rem; font-weight:bold; line-height:2.2rem; color:#5a3e1b;">Select a pattern above.</div>
+        </div>
+    </div>
+    <footer>⭐ Learn faster, have fun! ⭐</footer>
+</div>
+
+<!-- Custom modal -->
+<div id="resultModal" class="modal">
+    <div class="modal-content">
+        <h2>📊 RESULTS</h2>
+        <div id="modalMessage"></div>
+        <div class="modal-buttons">
+            <button id="modalPlayAgainBtn">🎮 Play Again</button>
+            <button id="modalMainMenuBtn">🏠 Main Menu</button>
+            <button id="modalExitBtn">❌ Exit</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------- GLOBAL STATE ----------
+    let currentMax = 12;
+    let quizActive = false;
+    let quizTimerInterval = null;
+    let currentQuizQuestion = { num1: 3, num2: 4, answer: 12 };
+    let quizScore = 0;
+    let quizCorrect = 0;
+    let quizWrong = 0;
+    let quizQuestionsDone = 0;
+    let quizTotalQuestions = 10;
+    let quizTimeLimit = 10;
+    let quizSpecificTable = 0;
+    let quizTimeLeft = 10;
+    let quizStartTime = 0;
+
+    // Fill in the blank
+    let fbCurrent = { correctAnswer: 0 };
+    let fbCorrectCount = 0, fbWrongCount = 0, fbTotal = 0, fbQuestionsDone = 0;
+    let fbStartTime = 0;
+    let fbActive = false;
+
+    // Speed drill
+    let drillActive = false, drillInterval = null, drillTimeLeftSec = 0;
+    let drillCorrect = 0, drillWrong = 0, drillCurrentAnswer = 0, drillWaitingNext = false;
+    let drillStartTime = 0;
+
+    // Flashcards
+    let flashCurrentAnswer = 0;
+
+    // Helper functions
+    function playBeep(correct) {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = correct ? 1000 : 300;
+            gain.gain.value = 0.1;
+            osc.start();
+            gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.5);
+            osc.stop(audioCtx.currentTime + 0.3);
+        } catch(e) {}
+    }
+
+    function showQuizFeedback(correct, correctAnswer = null) {
+        const iconDiv = document.getElementById('feedbackIcon');
+        if (correct) {
+            iconDiv.innerHTML = '✅ Correct!';
+            iconDiv.style.color = '#2E8B57';
+        } else {
+            iconDiv.innerHTML = `❌ Wrong! Answer: ${correctAnswer}`;
+            iconDiv.style.color = '#DC143C';
+        }
+        iconDiv.style.opacity = '1';
+        setTimeout(() => {
+            iconDiv.style.opacity = '0';
+        }, 1500);
+    }
+
+    function showFBFeedback(correct, correctAnswer = null) {
+        const iconDiv = document.getElementById('fbFeedbackIcon');
+        if (correct) {
+            iconDiv.innerHTML = '✅ Correct!';
+            iconDiv.style.color = '#2E8B57';
+        } else {
+            iconDiv.innerHTML = `❌ Wrong! Answer: ${correctAnswer}`;
+            iconDiv.style.color = '#DC143C';
+        }
+        iconDiv.style.opacity = '1';
+        setTimeout(() => {
+            iconDiv.innerHTML = '';
+        }, 1500);
+    }
+
+    function showDrillFeedback(correct, correctAnswer = null) {
+        const iconDiv = document.getElementById('drillFeedbackIcon');
+        if (correct) {
+            iconDiv.innerHTML = '✅ Correct!';
+            iconDiv.style.color = '#2E8B57';
+        } else {
+            iconDiv.innerHTML = `❌ Wrong! Answer: ${correctAnswer}`;
+            iconDiv.style.color = '#DC143C';
+        }
+        iconDiv.style.opacity = '1';
+        setTimeout(() => {
+            iconDiv.innerHTML = '';
+        }, 1500);
+    }
+
+    function showTemporaryMessage(divId, msg, color = '#FF8C00') {
+        const div = document.getElementById(divId);
+        if (div) {
+            div.innerHTML = msg;
+            div.style.color = color;
+            setTimeout(() => {
+                div.innerHTML = '';
+            }, 1200);
+        }
+    }
+
+    function updateRangeDisplay() {
+        document.getElementById('rangeDisplay').innerText = `Current: 1–${currentMax}`;
+        const quizSpec = document.getElementById('quizSpecificTable');
+        if (quizSpec) quizSpec.max = currentMax;
+        if (parseInt(quizSpec?.value) > currentMax) quizSpec.value = 0;
+        updateSkipTableSelect();
+        updateFlashcardDropdown();
+        updateMasteryTableSelect();
+        updateMasteryList();
+    }
+
+    function updateSkipTableSelect() {
+        const select = document.getElementById('skipTableSelect');
+        if (!select) return;
+        const currentVal = parseInt(select.value);
+        select.innerHTML = '';
+        for (let i = 2; i <= currentMax; i++) {
+            const opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = i;
+            select.appendChild(opt);
+        }
+        if (!isNaN(currentVal) && currentVal >= 2 && currentVal <= currentMax) {
+            select.value = currentVal;
+        } else {
+            select.value = Math.min(2, currentMax);
+        }
+    }
+
+    function updateMasteryTableSelect() {
+        const select = document.getElementById('masteryTableSelect');
+        if (!select) return;
+        const currentVal = parseInt(select.value);
+        select.innerHTML = '';
+        for (let i = 1; i <= currentMax; i++) {
+            const opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = i;
+            select.appendChild(opt);
+        }
+        if (!isNaN(currentVal) && currentVal >= 1 && currentVal <= currentMax) {
+            select.value = currentVal;
+        } else {
+            select.value = 1;
+        }
+    }
+
+    function updateMasteryList() {
+        const table = parseInt(document.getElementById('masteryTableSelect').value);
+        if (isNaN(table)) return;
+        const max = currentMax;
+        let html = '';
+        for (let i = 1; i <= max; i++) {
+            html += `${table} × ${i} = ${table * i}<br>`;
+        }
+        document.getElementById('masteryList').innerHTML = html;
+    }
+
+    function updateFlashcardDropdown() {
+        const select = document.getElementById('flashTableSelect');
+        if (!select) return;
+        const currentVal = parseInt(select.value);
+        select.innerHTML = '';
+        const option0 = document.createElement('option');
+        option0.value = '0';
+        option0.textContent = '0 (mixed)';
+        select.appendChild(option0);
+        for (let i = 1; i <= currentMax; i++) {
+            const opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = i;
+            select.appendChild(opt);
+        }
+        if (!isNaN(currentVal) && currentVal >= 0 && currentVal <= currentMax) {
+            select.value = currentVal;
+        } else {
+            select.value = '0';
+        }
+    }
+
+    function populateRangeSelect() {
+        const select = document.getElementById('globalMaxSelect');
+        select.innerHTML = '';
+        for (let i = 5; i <= 20; i++) {
+            const opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = i;
+            select.appendChild(opt);
+        }
+        select.value = currentMax;
+    }
+    
+    function populateDrillMinutesSelect() {
+        const select = document.getElementById('drillMinutesSelect');
+        select.innerHTML = '';
+        for (let i = 1; i <= 30; i++) {
+            const opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = `${i} minute${i !== 1 ? 's' : ''}`;
+            select.appendChild(opt);
+        }
+        select.value = 1;
+    }
+
+    function populateFBQuestionSelect() {
+        const select = document.getElementById('fbNumQuestions');
+        select.innerHTML = '';
+        for (let i = 5; i <= 100; i += 5) {
+            const opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = i;
+            select.appendChild(opt);
+        }
+        select.value = 10;
+    }
+
+    function applyGlobalRange() {
+        currentMax = parseInt(document.getElementById('globalMaxSelect').value);
+        updateRangeDisplay();
+        if (document.getElementById('memorizePanel').classList.contains('active-panel')) buildChart();
+    }
+
+    // ---------- STOP ALL SESSIONS & RESET UI ----------
+    function stopAllSessions() {
+        if (quizActive) {
+            stopQuiz();
+            document.getElementById('quizGameArea').classList.remove('active');
+            document.getElementById('quizEquationRow').innerHTML = '';
+            document.getElementById('timerDisplay').innerText = '--';
+            document.getElementById('quizProgress').innerText = '0/0';
+            document.getElementById('totalQuestionsSpan').innerText = '0';
+            document.getElementById('quizScore').innerText = '0';
+            document.getElementById('feedbackIcon').innerHTML = '';
+        }
+        if (drillActive) {
+            if (drillInterval) clearInterval(drillInterval);
+            drillActive = false;
+            document.getElementById('startDrillBtn').disabled = false;
+            document.getElementById('drillInputArea').style.display = 'none';
+            document.getElementById('drillTimer').innerText = '--:--';
+            document.getElementById('drillQuestion').innerHTML = '--';
+            document.getElementById('drillAnswerInput').disabled = true;
+            document.getElementById('drillSubmitBtn').disabled = true;
+            document.getElementById('drillCorrect').innerText = '0';
+            document.getElementById('drillWrong').innerText = '0';
+            document.getElementById('drillFeedbackIcon').innerHTML = '';
+        }
+        fbActive = false;
+        fbCorrectCount = 0;
+        fbWrongCount = 0;
+        fbQuestionsDone = 0;
+        fbTotal = 0;
+        document.getElementById('fbCorrect').innerText = '0';
+        document.getElementById('fbWrong').innerText = '0';
+        document.getElementById('fbRemaining').innerText = '0';
+        document.getElementById('fbFeedbackIcon').innerHTML = '';
+        document.getElementById('fbQuestion').innerHTML = '?';
+        document.getElementById('fbAnswer').value = '';
+        document.getElementById('fbAnswer').disabled = true;
+        document.getElementById('fbCheckBtn').disabled = true;
+    }
+
+    // ---------- QUIZ MODE ----------
+    function generateQuizQuestion() {
+        let max = currentMax;
+        let num1, num2;
+        if (quizSpecificTable > 0 && quizSpecificTable <= max) {
+            num1 = quizSpecificTable;
+            num2 = Math.floor(Math.random() * max) + 1;
+        } else {
+            num1 = Math.floor(Math.random() * max) + 1;
+            num2 = Math.floor(Math.random() * max) + 1;
+        }
+        currentQuizQuestion = { num1, num2, answer: num1 * num2 };
+        
+        const equationRow = document.getElementById('quizEquationRow');
+        equationRow.innerHTML = `
+            <span>${num1} × ${num2} = </span>
+            <input type="number" id="inlineAnswerInput" class="inline-answer-input" autocomplete="off">
+            <button id="inlineCheckBtn" class="inline-check-btn">Submit</button>
+        `;
+        
+        const answerInput = document.getElementById('inlineAnswerInput');
+        const checkBtn = document.getElementById('inlineCheckBtn');
+        answerInput.value = '';
+        answerInput.disabled = false;
+        checkBtn.disabled = false;
+        answerInput.focus();
+        
+        checkBtn.onclick = () => checkQuizAnswer();
+        answerInput.onkeypress = (e) => {
+            if (e.key === 'Enter' && quizActive && !checkBtn.disabled) {
+                checkQuizAnswer();
+            }
+        };
+        
+        document.getElementById('feedbackIcon').innerHTML = '';
+    }
+
+    function startQuizTimer() {
+        if (quizTimerInterval) clearInterval(quizTimerInterval);
+        quizTimeLeft = quizTimeLimit;
+        document.getElementById('timerDisplay').innerText = quizTimeLeft;
+        quizTimerInterval = setInterval(() => {
+            if (!quizActive) return;
+            if (quizTimeLeft <= 0) {
+                clearInterval(quizTimerInterval);
+                handleQuizTimeout();
+            } else {
+                quizTimeLeft--;
+                document.getElementById('timerDisplay').innerText = quizTimeLeft;
+            }
+        }, 1000);
+    }
+
+    function handleQuizTimeout() {
+        if (!quizActive) return;
+        playBeep(false);
+        showQuizFeedback(false, currentQuizQuestion.answer);
+        const answerInput = document.getElementById('inlineAnswerInput');
+        const checkBtn = document.getElementById('inlineCheckBtn');
+        if (answerInput) answerInput.disabled = true;
+        if (checkBtn) checkBtn.disabled = true;
+        quizWrong++;
+        quizQuestionsDone++;
+        updateQuizProgress();
+        if (quizQuestionsDone >= quizTotalQuestions) {
+            endQuiz();
+        } else {
+            setTimeout(() => {
+                if (quizActive) {
+                    generateQuizQuestion();
+                    startQuizTimer();
+                }
+            }, 600);
+        }
+    }
+
+    function checkQuizAnswer() {
+        if (!quizActive) return;
+        const answerInput = document.getElementById('inlineAnswerInput');
+        const rawValue = answerInput.value.trim();
+        if (rawValue === '') {
+            showTemporaryMessage('feedbackIcon', '📝 Please type your answer!', '#FF8C00');
+            return;
+        }
+        const userAns = parseInt(rawValue);
+        if (isNaN(userAns)) {
+            showTemporaryMessage('feedbackIcon', '🔢 Type a number!', '#FF8C00');
+            return;
+        }
+        clearInterval(quizTimerInterval);
+        const correct = (userAns === currentQuizQuestion.answer);
+        if (correct) {
+            quizCorrect++;
+            playBeep(true);
+            showQuizFeedback(true);
+        } else {
+            quizWrong++;
+            playBeep(false);
+            showQuizFeedback(false, currentQuizQuestion.answer);
+        }
+        quizScore = quizCorrect;
+        document.getElementById('quizScore').innerText = quizScore;
+        
+        const checkBtn = document.getElementById('inlineCheckBtn');
+        answerInput.disabled = true;
+        checkBtn.disabled = true;
+        
+        quizQuestionsDone++;
+        updateQuizProgress();
+        if (quizQuestionsDone >= quizTotalQuestions) {
+            endQuiz();
+        } else {
+            setTimeout(() => {
+                if (quizActive) {
+                    generateQuizQuestion();
+                    startQuizTimer();
+                }
+            }, 600);
+        }
+    }
+
+    function updateQuizProgress() {
+        document.getElementById('quizProgress').innerText = `${quizQuestionsDone}/${quizTotalQuestions}`;
+    }
+
+    function startQuizSession() {
+        if (quizActive) stopQuiz();
+        quizActive = true;
+        quizCorrect = 0;
+        quizWrong = 0;
+        quizScore = 0;
+        quizQuestionsDone = 0;
+        quizStartTime = Date.now();
+        document.getElementById('quizScore').innerText = '0';
+        document.getElementById('totalQuestionsSpan').innerText = quizTotalQuestions;
+        updateQuizProgress();
+        document.getElementById('quizGameArea').classList.add('active');
+        generateQuizQuestion();
+        startQuizTimer();
+    }
+
+    function stopQuiz() {
+        if (quizTimerInterval) clearInterval(quizTimerInterval);
+        quizActive = false;
+    }
+
+    // ---------- CUSTOM MODAL WITH EXIT BUTTON ----------
+    function showCustomModal(title, message, onPlayAgain, onMainMenu, onExit) {
+        const modal = document.getElementById('resultModal');
+        document.getElementById('modalMessage').innerHTML = message;
+        document.querySelector('#resultModal .modal-content h2').innerText = title;
+        modal.style.display = 'flex';
+        
+        const playAgainBtn = document.getElementById('modalPlayAgainBtn');
+        const mainMenuBtn = document.getElementById('modalMainMenuBtn');
+        const exitBtn = document.getElementById('modalExitBtn');
+        
+        const newPlayAgain = () => {
+            modal.style.display = 'none';
+            if (onPlayAgain) onPlayAgain();
+        };
+        const newMainMenu = () => {
+            modal.style.display = 'none';
+            if (onMainMenu) onMainMenu();
+        };
+        const newExit = () => {
+            modal.style.display = 'none';
+            if (onExit) onExit();
+        };
+        
+        playAgainBtn.replaceWith(playAgainBtn.cloneNode(true));
+        mainMenuBtn.replaceWith(mainMenuBtn.cloneNode(true));
+        exitBtn.replaceWith(exitBtn.cloneNode(true));
+        
+        const newPlayAgainBtn = document.getElementById('modalPlayAgainBtn');
+        const newMainMenuBtn = document.getElementById('modalMainMenuBtn');
+        const newExitBtn = document.getElementById('modalExitBtn');
+        
+        newPlayAgainBtn.addEventListener('click', newPlayAgain);
+        newMainMenuBtn.addEventListener('click', newMainMenu);
+        newExitBtn.addEventListener('click', newExit);
+    }
+
+    function endQuiz() {
+        stopQuiz();
+        const totalTimeSec = (Date.now() - quizStartTime) / 1000;
+        const avgSec = totalTimeSec / quizTotalQuestions;
+        const accuracyPercent = (quizCorrect / quizTotalQuestions) * 100;
+        const questionsPerMinute = (quizCorrect / (totalTimeSec / 60));
+        let speedScore = (questionsPerMinute / 30) * 100;
+        if (speedScore > 100) speedScore = 100;
+        if (speedScore < 0) speedScore = 0;
+        const totalScore = (accuracyPercent * 0.9) + (speedScore * 0.1);
+        
+        let msg = `🎯 Accuracy: ${accuracyPercent.toFixed(0)}% (weight 90%)<br>`;
+        msg += `⚡ Speed: ${speedScore.toFixed(0)}% (weight 10%)<br>`;
+        msg += `🏆 Total Score: ${totalScore.toFixed(0)}%<br><br>`;
+        msg += `📊 Details: ${quizCorrect}/${quizTotalQuestions} correct, ${quizWrong} wrong<br>`;
+        msg += `⏱️ Total time: ${totalTimeSec.toFixed(1)} seconds<br>`;
+        msg += `⏱️ Average: ${avgSec.toFixed(1)} sec/question<br>`;
+        msg += `🚀 ${questionsPerMinute.toFixed(1)} questions/min<br><br>`;
+        
+        if (totalScore >= 90) msg += "🏆 EXCELLENT! You're a champion! 🏆";
+        else if (totalScore >= 75) msg += "🌟 Great! Keep practicing! 🌟";
+        else if (totalScore >= 60) msg += "👍 Good! A little more practice! 👍";
+        else msg += "💪 Don't give up! Play again! 💪";
+        
+        showCustomModal('📊 QUIZ RESULTS', msg, 
+            () => { startQuizSession(); }, 
+            () => { document.getElementById('quizPanel').classList.remove('active-panel'); document.getElementById('memorizePanel').classList.remove('active-panel'); },
+            () => { 
+                document.getElementById('quizGameArea').classList.remove('active');
+                document.getElementById('quizEquationRow').innerHTML = '';
+                document.getElementById('timerDisplay').innerText = '--';
+                document.getElementById('quizProgress').innerText = '0/0';
+                document.getElementById('totalQuestionsSpan').innerText = '0';
+                document.getElementById('quizScore').innerText = '0';
+                document.getElementById('feedbackIcon').innerHTML = '';
+            }
+        );
+        
+        document.getElementById('quizGameArea').classList.remove('active');
+        document.getElementById('quizEquationRow').innerHTML = '';
+        document.getElementById('timerDisplay').innerText = '--';
+        document.getElementById('quizProgress').innerText = '0/0';
+        document.getElementById('totalQuestionsSpan').innerText = '0';
+        document.getElementById('quizScore').innerText = '0';
+        document.getElementById('feedbackIcon').innerHTML = '';
+    }
+
+    // ---------- INTERACTIVE CHART ----------
+    function buildChart() {
+        const container = document.getElementById('chartContainer');
+        container.innerHTML = '';
+        const max = currentMax;
+        const table = document.createElement('table');
+        table.style.borderCollapse = 'collapse';
+        table.style.margin = 'auto';
+        let tr = document.createElement('tr');
+        let th = document.createElement('th');
+        th.innerText = '×';
+        th.style.background = '#FFD700';
+        th.style.padding = '8px';
+        tr.appendChild(th);
+        for (let j = 1; j <= max; j++) {
+            let td = document.createElement('th');
+            td.innerText = j;
+            td.style.background = '#FFD700';
+            td.style.padding = '8px';
+            td.style.cursor = 'pointer';
+            td.addEventListener('click', (function(col) { return function() { highlightRowCol(col); }; })(j));
+            tr.appendChild(td);
+        }
+        table.appendChild(tr);
+        for (let i = 1; i <= max; i++) {
+            tr = document.createElement('tr');
+            let thFirst = document.createElement('th');
+            thFirst.innerText = i;
+            thFirst.style.background = '#FFD700';
+            thFirst.style.fontWeight = 'bold';
+            thFirst.style.padding = '8px';
+            thFirst.style.cursor = 'pointer';
+            thFirst.addEventListener('click', (function(row) { return function() { highlightRowCol(row); }; })(i));
+            tr.appendChild(thFirst);
+            for (let j = 1; j <= max; j++) {
+                let product = i * j;
+                let cell = document.createElement('td');
+                cell.innerText = product;
+                cell.style.background = ( (i+j) % 2 === 0 ) ? '#E0FFFF' : '#F0FFF0';
+                cell.style.padding = '8px';
+                cell.style.textAlign = 'center';
+                cell.style.cursor = 'pointer';
+                cell.style.border = '1px solid #FFD966';
+                cell.dataset.row = i;
+                cell.dataset.col = j;
+                cell.addEventListener('click', (function(r,c) { return function() { highlightUntil(r,c); }; })(i,j));
+                tr.appendChild(cell);
+            }
+            table.appendChild(tr);
+        }
+        container.appendChild(table);
+    }
+
+    function highlightRowCol(num) {
+        const cells = document.querySelectorAll('#chartContainer td');
+        cells.forEach(cell => {
+            let r = parseInt(cell.dataset.row);
+            let c = parseInt(cell.dataset.col);
+            if (r === num || c === num) {
+                cell.style.background = '#FFD966';
+            } else {
+                cell.style.background = ( (r+c) % 2 === 0 ) ? '#E0FFFF' : '#F0FFF0';
+            }
+        });
+    }
+
+    function highlightUntil(row, col) {
+        const cells = document.querySelectorAll('#chartContainer td');
+        cells.forEach(cell => {
+            let r = parseInt(cell.dataset.row);
+            let c = parseInt(cell.dataset.col);
+            if ( (r === row && c <= col) || (c === col && r <= row) ) {
+                cell.style.background = '#FFD966';
+            } else {
+                cell.style.background = ( (r+c) % 2 === 0 ) ? '#E0FFFF' : '#F0FFF0';
+            }
+        });
+    }
+
+    function resetChart() {
+        const cells = document.querySelectorAll('#chartContainer td');
+        cells.forEach(cell => {
+            let r = parseInt(cell.dataset.row);
+            let c = parseInt(cell.dataset.col);
+            cell.style.background = ( (r+c) % 2 === 0 ) ? '#E0FFFF' : '#F0FFF0';
+        });
+    }
+
+    // ---------- FLASHCARDS ----------
+    function updateFlashcard() {
+        const select = document.getElementById('flashTableSelect');
+        let table = parseInt(select.value);
+        if (isNaN(table)) table = 0;
+        if (table > currentMax) table = currentMax;
+        let num1, num2;
+        if (table === 0) {
+            num1 = Math.floor(Math.random() * currentMax) + 1;
+            num2 = Math.floor(Math.random() * currentMax) + 1;
+        } else {
+            num1 = table;
+            num2 = Math.floor(Math.random() * currentMax) + 1;
+        }
+        flashCurrentAnswer = num1 * num2;
+        document.getElementById('flashcardQuestion').innerHTML = `${num1} × ${num2} = ?`;
+        document.getElementById('flashcardAnswer').innerHTML = '';
+    }
+    function revealFlashcard() {
+        document.getElementById('flashcardAnswer').innerHTML = `${flashCurrentAnswer}`;
+    }
+
+    // ---------- FILL IN THE BLANK ----------
+    function startFillBlank() {
+        fbActive = true;
+        fbCorrectCount = 0;
+        fbWrongCount = 0;
+        fbQuestionsDone = 0;
+        fbTotal = parseInt(document.getElementById('fbNumQuestions').value);
+        document.getElementById('fbCorrect').innerText = '0';
+        document.getElementById('fbWrong').innerText = '0';
+        document.getElementById('fbRemaining').innerText = fbTotal;
+        document.getElementById('fbFeedbackIcon').innerHTML = '';
+        fbStartTime = Date.now();
+        document.getElementById('fbAnswer').disabled = false;
+        document.getElementById('fbCheckBtn').disabled = false;
+        generateFBQuestion();
+        document.getElementById('fbAnswer').focus();
+    }
+
+    function generateFBQuestion() {
+        if (!fbActive) return;
+        let a = Math.floor(Math.random() * currentMax) + 1;
+        let b = Math.floor(Math.random() * currentMax) + 1;
+        let prod = a * b;
+        let missingPos = Math.random() < 0.5 ? 1 : 2;
+        let questionText, correctAnswer;
+        if (missingPos === 1) {
+            questionText = `___ × ${b} = ${prod}`;
+            correctAnswer = a;
+        } else {
+            questionText = `${a} × ___ = ${prod}`;
+            correctAnswer = b;
+        }
+        fbCurrent = { correctAnswer };
+        document.getElementById('fbQuestion').innerHTML = questionText;
+        const answerInput = document.getElementById('fbAnswer');
+        answerInput.value = '';
+        document.getElementById('fbFeedbackIcon').innerHTML = '';
+        answerInput.focus();
+    }
+
+    function checkFB() {
+        if (!fbActive) {
+            showTemporaryMessage('fbFeedbackIcon', 'Please start a session first!', '#FF8C00');
+            return;
+        }
+        const answerInput = document.getElementById('fbAnswer');
+        const rawValue = answerInput.value.trim();
+        if (rawValue === '') {
+            showTemporaryMessage('fbFeedbackIcon', '📝 Please type your answer!', '#FF8C00');
+            answerInput.focus();
+            return;
+        }
+        const user = parseInt(rawValue);
+        if (isNaN(user)) {
+            showTemporaryMessage('fbFeedbackIcon', '🔢 Type a number!', '#FF8C00');
+            answerInput.focus();
+            return;
+        }
+        if (user === fbCurrent.correctAnswer) {
+            fbCorrectCount++;
+            playBeep(true);
+            showFBFeedback(true);
+        } else {
+            fbWrongCount++;
+            playBeep(false);
+            showFBFeedback(false, fbCurrent.correctAnswer);
+        }
+        fbQuestionsDone++;
+        document.getElementById('fbCorrect').innerText = fbCorrectCount;
+        document.getElementById('fbWrong').innerText = fbWrongCount;
+        const remaining = fbTotal - fbQuestionsDone;
+        document.getElementById('fbRemaining').innerText = remaining;
+        
+        if (fbQuestionsDone >= fbTotal) {
+            const totalTimeSec = (Date.now() - fbStartTime) / 1000;
+            const avgSec = totalTimeSec / fbTotal;
+            const accuracyPercent = (fbCorrectCount / fbTotal) * 100;
+            const questionsPerMinute = (fbCorrectCount / (totalTimeSec / 60));
+            let speedScore = (questionsPerMinute / 30) * 100;
+            if (speedScore > 100) speedScore = 100;
+            if (speedScore < 0) speedScore = 0;
+            const totalScore = (accuracyPercent * 0.9) + (speedScore * 0.1);
+            
+            let msg = `🎯 Accuracy: ${accuracyPercent.toFixed(0)}% (weight 90%)<br>`;
+            msg += `⚡ Speed: ${speedScore.toFixed(0)}% (weight 10%)<br>`;
+            msg += `🏆 Total Score: ${totalScore.toFixed(0)}%<br><br>`;
+            msg += `📊 Details: ${fbCorrectCount}/${fbTotal} correct, ${fbWrongCount} wrong<br>`;
+            msg += `⏱️ Total time: ${totalTimeSec.toFixed(1)} seconds<br>`;
+            msg += `⏱️ Average: ${avgSec.toFixed(1)} sec/question<br>`;
+            msg += `🚀 ${questionsPerMinute.toFixed(1)} questions/min<br><br>`;
+            
+            if (totalScore >= 90) msg += "🏆 EXCELLENT! You're a champion! 🏆";
+            else if (totalScore >= 75) msg += "🌟 Great! Keep practicing! 🌟";
+            else if (totalScore >= 60) msg += "👍 Good! A little more practice! 👍";
+            else msg += "💪 Don't give up! Play again! 💪";
+            
+            showCustomModal('📊 FILL IN THE BLANK RESULTS', msg, 
+                () => { startFillBlank(); }, 
+                () => { document.getElementById('memorizePanel').classList.remove('active-panel'); },
+                () => { 
+                    fbActive = false;
+                    document.getElementById('fbAnswer').disabled = true;
+                    document.getElementById('fbCheckBtn').disabled = true;
+                    document.getElementById('fbQuestion').innerHTML = '?';
+                    document.getElementById('fbCorrect').innerText = '0';
+                    document.getElementById('fbWrong').innerText = '0';
+                    document.getElementById('fbRemaining').innerText = '0';
+                    document.getElementById('fbFeedbackIcon').innerHTML = '';
+                }
+            );
+            fbActive = false;
+            document.getElementById('fbAnswer').disabled = true;
+            document.getElementById('fbCheckBtn').disabled = true;
+            document.getElementById('fbQuestion').innerHTML = '?';
+            return;
+        }
+        generateFBQuestion();
+    }
+
+    // ---------- SPEED DRILL ----------
+    function stopDrill() {
+        if (drillInterval) {
+            clearInterval(drillInterval);
+            drillInterval = null;
+        }
+        drillActive = false;
+        document.getElementById('startDrillBtn').disabled = false;
+        document.getElementById('drillInputArea').style.display = 'none';
+        document.getElementById('drillTimer').innerText = '--:--';
+        document.getElementById('drillQuestion').innerHTML = '--';
+        document.getElementById('drillAnswerInput').disabled = true;
+        document.getElementById('drillSubmitBtn').disabled = true;
+        document.getElementById('drillCorrect').innerText = '0';
+        document.getElementById('drillWrong').innerText = '0';
+        document.getElementById('drillFeedbackIcon').innerHTML = '';
+    }
+    
+    function startDrill() {
+        if (drillActive) stopDrill();
+        let minutes = parseInt(document.getElementById('drillMinutesSelect').value);
+        if (isNaN(minutes)) minutes = 1;
+        minutes = Math.min(30, Math.max(1, minutes));
+        drillTimeLeftSec = minutes * 60;
+        drillCorrect = 0;
+        drillWrong = 0;
+        drillActive = true;
+        drillStartTime = Date.now();
+        document.getElementById('drillCorrect').innerText = '0';
+        document.getElementById('drillWrong').innerText = '0';
+        document.getElementById('drillTimer').innerText = formatTime(drillTimeLeftSec);
+        document.getElementById('startDrillBtn').disabled = true;
+        document.getElementById('drillInputArea').style.display = 'flex';
+        document.getElementById('drillAnswerInput').value = '';
+        document.getElementById('drillAnswerInput').disabled = false;
+        document.getElementById('drillSubmitBtn').disabled = false;
+        document.getElementById('drillFeedbackIcon').innerHTML = '';
+        generateDrillQuestion();
+        document.getElementById('drillAnswerInput').focus();
+        drillInterval = setInterval(() => {
+            if (!drillActive) return;
+            if (drillTimeLeftSec <= 0) {
+                clearInterval(drillInterval);
+                endDrill();
+            } else {
+                drillTimeLeftSec--;
+                document.getElementById('drillTimer').innerText = formatTime(drillTimeLeftSec);
+            }
+        }, 1000);
+    }
+    
+    function formatTime(sec) {
+        let m = Math.floor(sec / 60);
+        let s = sec % 60;
+        return `${m}:${s < 10 ? '0'+s : s}`;
+    }
+    
+    function generateDrillQuestion() {
+        let a = Math.floor(Math.random() * currentMax) + 1;
+        let b = Math.floor(Math.random() * currentMax) + 1;
+        drillCurrentAnswer = a * b;
+        document.getElementById('drillQuestion').innerHTML = `${a} × ${b} = ?`;
+        document.getElementById('drillAnswerInput').value = '';
+        document.getElementById('drillAnswerInput').disabled = false;
+        document.getElementById('drillSubmitBtn').disabled = false;
+        document.getElementById('drillFeedbackIcon').innerHTML = '';
+        drillWaitingNext = false;
+        document.getElementById('drillAnswerInput').focus();
+    }
+    
+    function checkDrillAnswer() {
+        if (!drillActive || drillWaitingNext) return;
+        const answerInput = document.getElementById('drillAnswerInput');
+        const rawValue = answerInput.value.trim();
+        if (rawValue === '') {
+            showDrillFeedback(false, '?');
+            showTemporaryMessage('drillFeedbackIcon', '📝 Please type your answer!', '#FF8C00');
+            answerInput.focus();
+            return;
+        }
+        const ans = parseInt(rawValue);
+        if (isNaN(ans)) {
+            showDrillFeedback(false, '?');
+            showTemporaryMessage('drillFeedbackIcon', '🔢 Type a number!', '#FF8C00');
+            answerInput.focus();
+            return;
+        }
+        if (ans === drillCurrentAnswer) {
+            drillCorrect++;
+            playBeep(true);
+            showDrillFeedback(true);
+        } else {
+            drillWrong++;
+            playBeep(false);
+            showDrillFeedback(false, drillCurrentAnswer);
+        }
+        document.getElementById('drillCorrect').innerText = drillCorrect;
+        document.getElementById('drillWrong').innerText = drillWrong;
+        answerInput.disabled = true;
+        document.getElementById('drillSubmitBtn').disabled = true;
+        drillWaitingNext = true;
+        setTimeout(() => { if (drillActive) generateDrillQuestion(); }, 500);
+    }
+    
+    function endDrill() {
+        drillActive = false;
+        document.getElementById('startDrillBtn').disabled = false;
+        document.getElementById('drillInputArea').style.display = 'none';
+        document.getElementById('drillTimer').innerText = '--:--';
+        const totalTimeSec = (Date.now() - drillStartTime) / 1000;
+        const totalQuestions = drillCorrect + drillWrong;
+        if (totalQuestions === 0) {
+            let msg = `🎯 Accuracy: 0% (weight 90%)<br>`;
+            msg += `⚡ Speed: 0% (weight 10%)<br>`;
+            msg += `🏆 Total Score: 0%<br><br>`;
+            msg += `📊 Details: 0/0 correct<br>`;
+            msg += `⏱️ Total time: ${totalTimeSec.toFixed(1)} seconds<br>`;
+            msg += `⏱️ Average: 0.0 sec/question<br>`;
+            msg += `🚀 0.0 questions/min<br><br>`;
+            msg += `💪 Don't give up! Play again! 💪`;
+            showCustomModal('📊 SPEED DRILL RESULTS', msg, 
+                () => { startDrill(); }, 
+                () => { document.getElementById('memorizePanel').classList.remove('active-panel'); },
+                () => { 
+                    document.getElementById('drillQuestion').innerHTML = '--';
+                    document.getElementById('drillTimer').innerText = '--:--';
+                    document.getElementById('drillAnswerInput').disabled = true;
+                    document.getElementById('drillSubmitBtn').disabled = true;
+                    document.getElementById('drillCorrect').innerText = '0';
+                    document.getElementById('drillWrong').innerText = '0';
+                    document.getElementById('drillFeedbackIcon').innerHTML = '';
+                }
+            );
+            return;
+        }
+        const accuracyPercent = (drillCorrect / totalQuestions) * 100;
+        const questionsPerMinute = (drillCorrect / (totalTimeSec / 60));
+        let speedScore = (questionsPerMinute / 30) * 100;
+        if (speedScore > 100) speedScore = 100;
+        if (speedScore < 0) speedScore = 0;
+        const totalScore = (accuracyPercent * 0.9) + (speedScore * 0.1);
+        const avgSec = totalTimeSec / totalQuestions;
+        
+        let msg = `🎯 Accuracy: ${accuracyPercent.toFixed(0)}% (weight 90%)<br>`;
+        msg += `⚡ Speed: ${speedScore.toFixed(0)}% (weight 10%)<br>`;
+        msg += `🏆 Total Score: ${totalScore.toFixed(0)}%<br><br>`;
+        msg += `📊 Details: ${drillCorrect}/${totalQuestions} correct, ${drillWrong} wrong<br>`;
+        msg += `⏱️ Total time: ${totalTimeSec.toFixed(1)} seconds<br>`;
+        msg += `⏱️ Average: ${avgSec.toFixed(1)} sec/question<br>`;
+        msg += `🚀 ${questionsPerMinute.toFixed(1)} questions/min<br><br>`;
+        
+        if (totalScore >= 90) msg += "🏆 EXCELLENT! You're a champion! 🏆";
+        else if (totalScore >= 75) msg += "🌟 Great! Keep practicing! 🌟";
+        else if (totalScore >= 60) msg += "👍 Good! A little more practice! 👍";
+        else msg += "💪 Don't give up! Play again! 💪";
+        
+        showCustomModal('📊 SPEED DRILL RESULTS', msg, 
+            () => { startDrill(); }, 
+            () => { document.getElementById('memorizePanel').classList.remove('active-panel'); },
+            () => { 
+                document.getElementById('drillQuestion').innerHTML = '--';
+                document.getElementById('drillTimer').innerText = '--:--';
+                document.getElementById('drillAnswerInput').disabled = true;
+                document.getElementById('drillSubmitBtn').disabled = true;
+                document.getElementById('drillCorrect').innerText = '0';
+                document.getElementById('drillWrong').innerText = '0';
+                document.getElementById('drillFeedbackIcon').innerHTML = '';
+            }
+        );
+    }
+
+    // ---------- SKIP COUNTING ----------
+    function showSkipCounting() {
+        let table = parseInt(document.getElementById('skipTableSelect').value);
+        if (isNaN(table)) table = 2;
+        table = Math.min(currentMax, Math.max(2, table));
+        let numbers = [];
+        for (let i = 1; i <= currentMax; i++) numbers.push(table * i);
+        document.getElementById('skipOutput').innerHTML = `<strong>Skip count by ${table}:</strong><br> ${numbers.join(' → ')}<br>👏 That's ${currentMax} steps (up to ${table}×${currentMax}=${table*currentMax})`;
+    }
+
+    // ---------- PATTERN EXPLORER ----------
+    function showPattern(pattern) {
+        const content = {
+            nine: "🤚 9's Finger Trick: Hold hands, fold down 3rd finger for 9×3 → left 2, right 7 → 27. Works for 9×1 to 9×10.",
+            double: "✨ Doubling Trick: If 3×4=12, then 6×4=24 (double first), or 3×8=24 (double second). Use for 6,8,12 tables.",
+            swap: "🔄 Swap Trick: 3×4 = 4×3. Learn only half the table!",
+            eleven: "✨ 11's Magic: 11×3=33, 11×4=44, ... 11×10=110, 11×11=121, 11×12=132.",
+            tough: "✨ Tough Ones: 6×8=48 (6 and 8 went on a date, came home 48); 7×8=56 (5,6,7,8); 8×8=64; etc."
+        };
+        document.getElementById('patternDisplay').innerHTML = content[pattern] || "Select a pattern.";
+    }
+
+    // ---------- UI PANEL SWITCHING ----------
+    function showQuizPanel() {
+        stopAllSessions();
+        document.getElementById('quizPanel').classList.add('active-panel');
+        document.getElementById('memorizePanel').classList.remove('active-panel');
+    }
+    function showMemorizePanel() {
+        stopAllSessions();
+        document.getElementById('quizPanel').classList.remove('active-panel');
+        document.getElementById('memorizePanel').classList.add('active-panel');
+        buildChart();
+    }
+
+    // ---------- INIT & EVENT LISTENERS ----------
+    document.addEventListener('DOMContentLoaded', () => {
+        populateRangeSelect();
+        populateDrillMinutesSelect();
+        populateFBQuestionSelect();
+        updateRangeDisplay();
+        buildChart();
+        
+        document.getElementById('applyRangeBtn').addEventListener('click', () => {
+            applyGlobalRange();
+            if (document.getElementById('memorizePanel').classList.contains('active-panel')) buildChart();
+        });
+        document.getElementById('showQuizBtn').addEventListener('click', showQuizPanel);
+        document.getElementById('showMemorizeBtn').addEventListener('click', showMemorizePanel);
+        document.getElementById('resetChartBtn').addEventListener('click', resetChart);
+        document.getElementById('quizApplySettings').addEventListener('click', () => {
+            quizTotalQuestions = parseInt(document.getElementById('quizNumQuestions').value);
+            quizTimeLimit = parseInt(document.getElementById('quizTimeLimit').value);
+            quizSpecificTable = parseInt(document.getElementById('quizSpecificTable').value);
+            if (isNaN(quizSpecificTable)) quizSpecificTable = 0;
+            if (quizSpecificTable > currentMax) quizSpecificTable = 0;
+            if (quizActive) stopQuiz();
+            startQuizSession();
+        });
+        // Flashcards
+        const flashSelect = document.getElementById('flashTableSelect');
+        flashSelect.addEventListener('change', updateFlashcard);
+        document.getElementById('newCardBtn').addEventListener('click', updateFlashcard);
+        document.getElementById('revealAnswerBtn').addEventListener('click', revealFlashcard);
+        updateFlashcard();
+        // Fill in the blank
+        const fbInput = document.getElementById('fbAnswer');
+        fbInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && fbActive) {
+                e.preventDefault();
+                checkFB();
+            }
+        });
+        document.getElementById('fbCheckBtn').addEventListener('click', checkFB);
+        document.getElementById('fbStartBtn').addEventListener('click', startFillBlank);
+        // Speed drill
+        document.getElementById('startDrillBtn').addEventListener('click', startDrill);
+        document.getElementById('drillSubmitBtn').addEventListener('click', checkDrillAnswer);
+        document.getElementById('drillAnswerInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && drillActive && !drillWaitingNext) checkDrillAnswer();
+        });
+        // Skip counting
+        const skipSelect = document.getElementById('skipTableSelect');
+        skipSelect.addEventListener('change', showSkipCounting);
+        showSkipCounting();
+        // Mastery
+        const masterySelect = document.getElementById('masteryTableSelect');
+        masterySelect.addEventListener('change', updateMasteryList);
+        updateMasteryList();
+        // Pattern explorer
+        document.querySelectorAll('.pattern-btn').forEach(btn => {
+            btn.addEventListener('click', () => showPattern(btn.dataset.pattern));
+        });
+        // Tool tabs
+        const tabs = document.querySelectorAll('.tool-tab');
+        const contents = document.querySelectorAll('.tool-content');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                stopAllSessions();
+                const tool = tab.dataset.tool;
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                contents.forEach(c => c.classList.remove('active'));
+                document.getElementById(`tool${tool.charAt(0).toUpperCase() + tool.slice(1)}`).classList.add('active');
+                if (tool === 'chart') buildChart();
+                if (tool === 'fillblank') {
+                    document.getElementById('fbQuestion').innerHTML = '?';
+                    document.getElementById('fbAnswer').disabled = true;
+                    document.getElementById('fbCheckBtn').disabled = true;
+                    document.getElementById('fbCorrect').innerText = '0';
+                    document.getElementById('fbWrong').innerText = '0';
+                    document.getElementById('fbRemaining').innerText = '0';
+                    document.getElementById('fbFeedbackIcon').innerHTML = '';
+                }
+                if (tool === 'speeddrill') {
+                    document.getElementById('drillQuestion').innerHTML = '--';
+                    document.getElementById('drillTimer').innerText = '--:--';
+                    document.getElementById('drillAnswerInput').disabled = true;
+                    document.getElementById('drillSubmitBtn').disabled = true;
+                    document.getElementById('drillCorrect').innerText = '0';
+                    document.getElementById('drillWrong').innerText = '0';
+                    document.getElementById('drillFeedbackIcon').innerHTML = '';
+                }
+                if (tool === 'flashcards') {
+                    updateFlashcard();
+                }
+                if (tool === 'skip') {
+                    showSkipCounting();
+                }
+                if (tool === 'mastery') {
+                    updateMasteryList();
+                }
+            });
+        });
+        // Initial state
+        document.getElementById('quizPanel').classList.remove('active-panel');
+        document.getElementById('memorizePanel').classList.remove('active-panel');
+        document.getElementById('drillTimer').innerText = '--:--';
+        document.getElementById('drillQuestion').innerHTML = '--';
+        document.getElementById('drillAnswerInput').disabled = true;
+        document.getElementById('drillSubmitBtn').disabled = true;
+        document.getElementById('fbAnswer').disabled = true;
+        document.getElementById('fbCheckBtn').disabled = true;
+    });
+</script>
+</body>
+</html>
