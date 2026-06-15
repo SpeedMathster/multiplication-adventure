@@ -45,7 +45,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Fixed
 - (No fixes)
 
+## [2026-06-15]
 
+### Added
+- Detailed "How to Play" guide to `README.md` – explains all game modes (Quiz, Speed Drill, Fill in the Blank, Flashcards, Skip Counting, Mastery, Pattern Explorer, Multiplication Chart).
+
+### Changed
+- (No code changes)
+
+### Fixed
+- (No fixes)
 ---
 
 
