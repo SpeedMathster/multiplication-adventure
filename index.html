@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Multiplication Adventure – Online Math Game</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='70' fill='%23FF8C00'%3E⚡%3C/text%3E%3C/svg%3E">
-    
     <style>
+        /* Copyright © 2025 [Your Name] – All rights reserved. */
         * {
             box-sizing: border-box;
         }
@@ -288,6 +288,10 @@
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
             border: 3px solid #FFD966;
         }
+        .flashcard-card:hover {
+            transform: scale(1.02);
+            transition: transform 0.2s ease;
+        }
         .flashcard-answer-area {
             min-height: 100px;
             display: flex;
@@ -479,7 +483,7 @@
             background: white;
             margin-left: 10px;
         }
-        /* Mastery (Times Table List) */
+        /* Mastery */
         #toolMastery {
             text-align: center;
         }
@@ -555,6 +559,8 @@
             width: 90%;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             font-size: 1.2rem;
+            position: relative;
+            overflow: hidden;
         }
         .modal-content h2 {
             color: #D2691E;
@@ -566,6 +572,16 @@
             gap: 10px;
             flex-wrap: wrap;
             margin-top: 20px;
+        }
+        /* Confetti Canvas - overlays everything */
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
         }
         footer {
             text-align: center;
@@ -735,7 +751,7 @@
             <div id="skipOutput" style="background:#FFFFE0; padding:20px; border-radius:30px; margin-top:20px; font-size:1.8rem; font-weight:bold; line-height:2.5rem;"></div>
         </div>
 
-        <!-- Mastery (Times Table List) -->
+        <!-- Mastery -->
         <div id="toolMastery" class="tool-content">
             <h3>📚 Times Table Mastery</h3>
             <div class="mastery-container">
@@ -777,7 +793,11 @@
     </div>
 </div>
 
+<!-- Confetti Canvas -->
+<canvas id="confettiCanvas"></canvas>
+
 <script>
+    // © 2025 [Your Name] – All rights reserved.
     // ---------- GLOBAL STATE ----------
     let currentMax = 12;
     let quizActive = false;
@@ -806,6 +826,97 @@
 
     // Flashcards
     let flashCurrentAnswer = 0;
+
+    // ---------- CONFETTI SYSTEM ----------
+    const canvas = document.getElementById('confettiCanvas');
+    const ctx = canvas.getContext('2d');
+    let confettiPieces = [];
+    let confettiActive = false;
+    let confettiAnimationId = null;
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class ConfettiPiece {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height - canvas.height;
+            this.w = Math.random() * 10 + 5;
+            this.h = Math.random() * 6 + 3;
+            this.color = `hsl(${Math.random() * 360}, 80%, 60%)`;
+            this.vy = Math.random() * 3 + 2;
+            this.vx = (Math.random() - 0.5) * 2;
+            this.rotation = Math.random() * 360;
+            this.rotationSpeed = (Math.random() - 0.5) * 10;
+            this.opacity = 1;
+        }
+
+        update() {
+            this.y += this.vy;
+            this.x += this.vx + Math.sin(this.y * 0.01) * 0.5;
+            this.rotation += this.rotationSpeed;
+            this.vy += 0.02; // gravity
+            if (this.y > canvas.height + 20) {
+                this.opacity = 0;
+            }
+        }
+
+        draw() {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate((this.rotation * Math.PI) / 180);
+            ctx.globalAlpha = this.opacity;
+            ctx.fillStyle = this.color;
+            ctx.fillRect(-this.w / 2, -this.h / 2, this.w, this.h);
+            ctx.restore();
+        }
+    }
+
+    function triggerConfetti() {
+        // Clear any existing confetti
+        confettiPieces = [];
+        if (confettiAnimationId) {
+            cancelAnimationFrame(confettiAnimationId);
+            confettiAnimationId = null;
+        }
+        confettiActive = true;
+        // Spawn 200 pieces
+        for (let i = 0; i < 200; i++) {
+            confettiPieces.push(new ConfettiPiece());
+        }
+        animateConfetti();
+        // Auto-stop after 5 seconds
+        setTimeout(() => {
+            confettiActive = false;
+            if (confettiAnimationId) {
+                cancelAnimationFrame(confettiAnimationId);
+                confettiAnimationId = null;
+            }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }, 5000);
+    }
+
+    function animateConfetti() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let anyAlive = false;
+        for (let piece of confettiPieces) {
+            if (piece.opacity > 0) {
+                piece.update();
+                piece.draw();
+                if (piece.opacity > 0) anyAlive = true;
+            }
+        }
+        if (anyAlive && confettiActive) {
+            confettiAnimationId = requestAnimationFrame(animateConfetti);
+        } else {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            confettiActive = false;
+        }
+    }
 
     // Helper functions
     function playBeep(correct) {
@@ -1187,8 +1298,11 @@
         quizActive = false;
     }
 
-    // ---------- CUSTOM MODAL WITH EXIT BUTTON ----------
-    function showCustomModal(title, message, onPlayAgain, onMainMenu, onExit) {
+    // ---------- CUSTOM MODAL WITH EXIT BUTTON (80% accuracy, 20% speed) + CONFETTI ----------
+    function showCustomModal(title, message, onPlayAgain, onMainMenu, onExit, showConfetti = false) {
+        if (showConfetti) {
+            triggerConfetti();
+        }
         const modal = document.getElementById('resultModal');
         document.getElementById('modalMessage').innerHTML = message;
         document.querySelector('#resultModal .modal-content h2').innerText = title;
@@ -1233,10 +1347,10 @@
         let speedScore = (questionsPerMinute / 30) * 100;
         if (speedScore > 100) speedScore = 100;
         if (speedScore < 0) speedScore = 0;
-        const totalScore = (accuracyPercent * 0.9) + (speedScore * 0.1);
+        const totalScore = (accuracyPercent * 0.8) + (speedScore * 0.2);
         
-        let msg = `🎯 Accuracy: ${accuracyPercent.toFixed(0)}% (weight 90%)<br>`;
-        msg += `⚡ Speed: ${speedScore.toFixed(0)}% (weight 10%)<br>`;
+        let msg = `🎯 Accuracy: ${accuracyPercent.toFixed(0)}% (weight 80%)<br>`;
+        msg += `⚡ Speed: ${speedScore.toFixed(0)}% (weight 20%)<br>`;
         msg += `🏆 Total Score: ${totalScore.toFixed(0)}%<br><br>`;
         msg += `📊 Details: ${quizCorrect}/${quizTotalQuestions} correct, ${quizWrong} wrong<br>`;
         msg += `⏱️ Total time: ${totalTimeSec.toFixed(1)} seconds<br>`;
@@ -1247,6 +1361,8 @@
         else if (totalScore >= 75) msg += "🌟 Great! Keep practicing! 🌟";
         else if (totalScore >= 60) msg += "👍 Good! A little more practice! 👍";
         else msg += "💪 Don't give up! Play again! 💪";
+        
+        const shouldConfetti = (totalScore >= 99.5);
         
         showCustomModal('📊 QUIZ RESULTS', msg, 
             () => { startQuizSession(); }, 
@@ -1259,7 +1375,8 @@
                 document.getElementById('totalQuestionsSpan').innerText = '0';
                 document.getElementById('quizScore').innerText = '0';
                 document.getElementById('feedbackIcon').innerHTML = '';
-            }
+            },
+            shouldConfetti
         );
         
         document.getElementById('quizGameArea').classList.remove('active');
@@ -1381,7 +1498,7 @@
         document.getElementById('flashcardAnswer').innerHTML = `${flashCurrentAnswer}`;
     }
 
-    // ---------- FILL IN THE BLANK ----------
+    // ---------- FILL IN THE BLANK (80/20 weights) + CONFETTI ----------
     function startFillBlank() {
         fbActive = true;
         fbCorrectCount = 0;
@@ -1462,10 +1579,10 @@
             let speedScore = (questionsPerMinute / 30) * 100;
             if (speedScore > 100) speedScore = 100;
             if (speedScore < 0) speedScore = 0;
-            const totalScore = (accuracyPercent * 0.9) + (speedScore * 0.1);
+            const totalScore = (accuracyPercent * 0.8) + (speedScore * 0.2);
             
-            let msg = `🎯 Accuracy: ${accuracyPercent.toFixed(0)}% (weight 90%)<br>`;
-            msg += `⚡ Speed: ${speedScore.toFixed(0)}% (weight 10%)<br>`;
+            let msg = `🎯 Accuracy: ${accuracyPercent.toFixed(0)}% (weight 80%)<br>`;
+            msg += `⚡ Speed: ${speedScore.toFixed(0)}% (weight 20%)<br>`;
             msg += `🏆 Total Score: ${totalScore.toFixed(0)}%<br><br>`;
             msg += `📊 Details: ${fbCorrectCount}/${fbTotal} correct, ${fbWrongCount} wrong<br>`;
             msg += `⏱️ Total time: ${totalTimeSec.toFixed(1)} seconds<br>`;
@@ -1476,6 +1593,8 @@
             else if (totalScore >= 75) msg += "🌟 Great! Keep practicing! 🌟";
             else if (totalScore >= 60) msg += "👍 Good! A little more practice! 👍";
             else msg += "💪 Don't give up! Play again! 💪";
+            
+            const shouldConfetti = (totalScore >= 99.5);
             
             showCustomModal('📊 FILL IN THE BLANK RESULTS', msg, 
                 () => { startFillBlank(); }, 
@@ -1489,7 +1608,8 @@
                     document.getElementById('fbWrong').innerText = '0';
                     document.getElementById('fbRemaining').innerText = '0';
                     document.getElementById('fbFeedbackIcon').innerHTML = '';
-                }
+                },
+                shouldConfetti
             );
             fbActive = false;
             document.getElementById('fbAnswer').disabled = true;
@@ -1500,7 +1620,7 @@
         generateFBQuestion();
     }
 
-    // ---------- SPEED DRILL ----------
+    // ---------- SPEED DRILL (80/20 weights) + CONFETTI ----------
     function stopDrill() {
         if (drillInterval) {
             clearInterval(drillInterval);
@@ -1612,8 +1732,8 @@
         const totalTimeSec = (Date.now() - drillStartTime) / 1000;
         const totalQuestions = drillCorrect + drillWrong;
         if (totalQuestions === 0) {
-            let msg = `🎯 Accuracy: 0% (weight 90%)<br>`;
-            msg += `⚡ Speed: 0% (weight 10%)<br>`;
+            let msg = `🎯 Accuracy: 0% (weight 80%)<br>`;
+            msg += `⚡ Speed: 0% (weight 20%)<br>`;
             msg += `🏆 Total Score: 0%<br><br>`;
             msg += `📊 Details: 0/0 correct<br>`;
             msg += `⏱️ Total time: ${totalTimeSec.toFixed(1)} seconds<br>`;
@@ -1631,7 +1751,8 @@
                     document.getElementById('drillCorrect').innerText = '0';
                     document.getElementById('drillWrong').innerText = '0';
                     document.getElementById('drillFeedbackIcon').innerHTML = '';
-                }
+                },
+                false
             );
             return;
         }
@@ -1640,11 +1761,11 @@
         let speedScore = (questionsPerMinute / 30) * 100;
         if (speedScore > 100) speedScore = 100;
         if (speedScore < 0) speedScore = 0;
-        const totalScore = (accuracyPercent * 0.9) + (speedScore * 0.1);
+        const totalScore = (accuracyPercent * 0.8) + (speedScore * 0.2);
         const avgSec = totalTimeSec / totalQuestions;
         
-        let msg = `🎯 Accuracy: ${accuracyPercent.toFixed(0)}% (weight 90%)<br>`;
-        msg += `⚡ Speed: ${speedScore.toFixed(0)}% (weight 10%)<br>`;
+        let msg = `🎯 Accuracy: ${accuracyPercent.toFixed(0)}% (weight 80%)<br>`;
+        msg += `⚡ Speed: ${speedScore.toFixed(0)}% (weight 20%)<br>`;
         msg += `🏆 Total Score: ${totalScore.toFixed(0)}%<br><br>`;
         msg += `📊 Details: ${drillCorrect}/${totalQuestions} correct, ${drillWrong} wrong<br>`;
         msg += `⏱️ Total time: ${totalTimeSec.toFixed(1)} seconds<br>`;
@@ -1655,6 +1776,8 @@
         else if (totalScore >= 75) msg += "🌟 Great! Keep practicing! 🌟";
         else if (totalScore >= 60) msg += "👍 Good! A little more practice! 👍";
         else msg += "💪 Don't give up! Play again! 💪";
+        
+        const shouldConfetti = (totalScore >= 99.5);
         
         showCustomModal('📊 SPEED DRILL RESULTS', msg, 
             () => { startDrill(); }, 
@@ -1667,7 +1790,8 @@
                 document.getElementById('drillCorrect').innerText = '0';
                 document.getElementById('drillWrong').innerText = '0';
                 document.getElementById('drillFeedbackIcon').innerHTML = '';
-            }
+            },
+            shouldConfetti
         );
     }
 
