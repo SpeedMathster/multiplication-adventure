@@ -49,6 +49,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 - Detailed "How to Play" guide to `README.md` – explains all game modes (Quiz, Speed Drill, Fill in the Blank, Flashcards, Skip Counting, Mastery, Pattern Explorer, Multiplication Chart).
 
+## [2026-06-16]
+
+### Added
+- **Confetti animation** – triggers when a player achieves a perfect score (≥ 99.5%) in Quiz, Fill in the Blank, or Speed Drill. Adds a fun celebration effect.
+- **Flashcard hover effect** – cards now scale up slightly when hovered, improving interactivity.
 
 
 ---
