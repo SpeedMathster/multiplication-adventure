@@ -55,6 +55,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Confetti animation** – triggers when a player achieves a perfect score (≥ 99.5%) in Quiz, Fill in the Blank, or Speed Drill. Adds a fun celebration effect.
 - **Flashcard hover effect** – cards now scale up slightly when hovered, improving interactivity.
 
+## [2026-06-17]
+
+### Added
+- `.gitignore` file to exclude system, temp, and IDE files from the repository.
+
 
 ---
 
