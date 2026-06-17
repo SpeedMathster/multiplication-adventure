@@ -1,0 +1,50 @@
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories (if you ever use npm)
+node_modules/
+jspm_packages/
+package-lock.json
+yarn.lock
+
+# IDE / Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+build/
+out/
+*.min.js
+*.min.css
+
+# Screenshots or large media (if you add them elsewhere)
+# *.png
+# *.jpg
+# *.gif
+
+# GitHub specific
+.github/*.local
