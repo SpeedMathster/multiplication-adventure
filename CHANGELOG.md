@@ -60,6 +60,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 - `.gitignore` file to exclude system, temp, and IDE files from the repository.
 
+## [2026-06-18]
+
+### Added
+- `CONTRIBUTING.md` – guidelines for reporting issues, suggesting features, and submitting changes.
 
 ---
 
