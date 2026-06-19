@@ -65,6 +65,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 - `CONTRIBUTING.md` – guidelines for reporting issues, suggesting features, and submitting changes.
 
+## [2026-06-19]
+
+### Added
+- **Share Score** button in the result modal – copies the score summary to clipboard with a link to the game.
+
 ---
 
 
