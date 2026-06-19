@@ -70,6 +70,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 - **Share Score** button in the result modal – copies the score summary to clipboard with a link to the game.
 
+## [2026-06-20]
+
+### Added
+- **Progress Bar** in Fill in the Blank – visually tracks completion progress (0–100%) with color changes from orange to green.
+
 ---
 
 
