@@ -337,6 +337,23 @@
             font-weight: bold;
             font-size: 1.2rem;
         }
+        /* Progress Bar for Fill in the Blank */
+        .fb-progress-container {
+            width: 100%;
+            height: 12px;
+            background: #f0e6d3;
+            border-radius: 20px;
+            margin: 10px 0;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .fb-progress-bar {
+            height: 100%;
+            width: 0%;
+            border-radius: 20px;
+            background: #FF8C00;
+            transition: width 0.5s ease, background 0.5s ease;
+        }
         .fill-blank-question {
             background: white;
             border-radius: 60px;
@@ -586,6 +603,41 @@
             font-size: 0.9rem;
             color: #2E8B57;
         }
+        /* Back to Top Button */
+        #backToTopBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #FF8C00;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 18px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: none;
+            z-index: 999;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+        }
+        #backToTopBtn:hover {
+            background: #E07B00;
+            transform: scale(1.05);
+        }
+        /* Sound Toggle */
+        #soundToggleBtn {
+            font-size: 1.5rem;
+            padding: 5px 15px;
+            background: #2196F3;
+            border-radius: 40px;
+            cursor: pointer;
+            border: none;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        #soundToggleBtn:hover {
+            background: #1976D2;
+        }
         /* Confetti Canvas */
         #confettiCanvas {
             position: fixed;
@@ -626,6 +678,7 @@
                 <!-- options will be populated by JS -->
             </select>
             <button id="applyRangeBtn" class="btn-blue">Apply</button>
+            <button id="soundToggleBtn">🔊</button>
         </div>
         <div class="range-display" id="rangeDisplay">Current: 1–12</div>
     </div>
@@ -720,6 +773,10 @@
                     <span>❌ Wrong: <span id="fbWrong">0</span></span>
                     <span>📝 Remaining: <span id="fbRemaining">0</span></span>
                 </div>
+                <!-- Progress Bar -->
+                <div class="fb-progress-container">
+                    <div class="fb-progress-bar" id="fbProgressBar"></div>
+                </div>
                 <div class="fill-blank-question" id="fbQuestion">?</div>
                 <input type="number" id="fbAnswer" class="fillblank-input" placeholder="" disabled>
                 <button id="fbCheckBtn" class="fb-submit-btn" disabled>Submit</button>
@@ -810,6 +867,9 @@
 <!-- Confetti Canvas -->
 <canvas id="confettiCanvas"></canvas>
 
+<!-- Back to Top Button -->
+<button id="backToTopBtn">⬆ Top</button>
+
 <script>
     // © 2025 [Your Name] – All rights reserved.
     // ---------- GLOBAL STATE ----------
@@ -840,6 +900,9 @@
 
     // Flashcards
     let flashCurrentAnswer = 0;
+
+    // Sound
+    let soundEnabled = true;
 
     // ---------- CONFETTI SYSTEM ----------
     const canvas = document.getElementById('confettiCanvas');
@@ -873,7 +936,7 @@
             this.y += this.vy;
             this.x += this.vx + Math.sin(this.y * 0.01) * 0.5;
             this.rotation += this.rotationSpeed;
-            this.vy += 0.02; // gravity
+            this.vy += 0.02;
             if (this.y > canvas.height + 20) {
                 this.opacity = 0;
             }
@@ -945,7 +1008,6 @@
                 shareBtn.textContent = originalText;
             }, 2000);
         }).catch(() => {
-            // Fallback for older browsers
             const textArea = document.createElement('textarea');
             textArea.value = fullText;
             document.body.appendChild(textArea);
@@ -961,8 +1023,15 @@
         });
     }
 
-    // Helper functions
+    // ---------- SOUND TOGGLE ----------
+    function toggleSound() {
+        soundEnabled = !soundEnabled;
+        document.getElementById('soundToggleBtn').textContent = soundEnabled ? '🔊' : '🔇';
+    }
+
+    // ---------- Helper functions ----------
     function playBeep(correct) {
+        if (!soundEnabled) return;
         try {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const osc = audioCtx.createOscillator();
@@ -1030,6 +1099,23 @@
             setTimeout(() => {
                 div.innerHTML = '';
             }, 1200);
+        }
+    }
+
+    // ---------- PROGRESS BAR UPDATE ----------
+    function updateFBProgress() {
+        const progress = fbTotal > 0 ? (fbQuestionsDone / fbTotal) * 100 : 0;
+        const bar = document.getElementById('fbProgressBar');
+        bar.style.width = `${progress}%`;
+        // Change color based on progress
+        if (progress < 33) {
+            bar.style.background = '#FF8C00'; // Orange
+        } else if (progress < 66) {
+            bar.style.background = '#FFC107'; // Yellow-Orange
+        } else if (progress < 90) {
+            bar.style.background = '#4CAF50'; // Green
+        } else {
+            bar.style.background = '#2E8B57'; // Dark Green
         }
     }
 
@@ -1193,6 +1279,9 @@
         document.getElementById('fbAnswer').value = '';
         document.getElementById('fbAnswer').disabled = true;
         document.getElementById('fbCheckBtn').disabled = true;
+        // Reset progress bar
+        document.getElementById('fbProgressBar').style.width = '0%';
+        document.getElementById('fbProgressBar').style.background = '#FF8C00';
     }
 
     // ---------- QUIZ MODE ----------
@@ -1355,7 +1444,7 @@
         const mainMenuBtn = document.getElementById('modalMainMenuBtn');
         const exitBtn = document.getElementById('modalExitBtn');
         const shareBtn = document.getElementById('modalShareBtn');
-        // Remove old listeners and attach new ones
+        
         const newPlayAgain = () => {
             modal.style.display = 'none';
             if (onPlayAgain) onPlayAgain();
@@ -1368,6 +1457,7 @@
             modal.style.display = 'none';
             if (onExit) onExit();
         };
+        
         playAgainBtn.replaceWith(playAgainBtn.cloneNode(true));
         mainMenuBtn.replaceWith(mainMenuBtn.cloneNode(true));
         exitBtn.replaceWith(exitBtn.cloneNode(true));
@@ -1538,7 +1628,7 @@
         document.getElementById('flashcardAnswer').innerHTML = `${flashCurrentAnswer}`;
     }
 
-    // ---------- FILL IN THE BLANK (80/20 weights) + CONFETTI ----------
+    // ---------- FILL IN THE BLANK (80/20 weights) + CONFETTI + PROGRESS BAR ----------
     function startFillBlank() {
         fbActive = true;
         fbCorrectCount = 0;
@@ -1549,6 +1639,9 @@
         document.getElementById('fbWrong').innerText = '0';
         document.getElementById('fbRemaining').innerText = fbTotal;
         document.getElementById('fbFeedbackIcon').innerHTML = '';
+        // Reset progress bar
+        document.getElementById('fbProgressBar').style.width = '0%';
+        document.getElementById('fbProgressBar').style.background = '#FF8C00';
         fbStartTime = Date.now();
         document.getElementById('fbAnswer').disabled = false;
         document.getElementById('fbCheckBtn').disabled = false;
@@ -1610,6 +1703,8 @@
         document.getElementById('fbWrong').innerText = fbWrongCount;
         const remaining = fbTotal - fbQuestionsDone;
         document.getElementById('fbRemaining').innerText = remaining;
+        // Update progress bar
+        updateFBProgress();
         
         if (fbQuestionsDone >= fbTotal) {
             const totalTimeSec = (Date.now() - fbStartTime) / 1000;
@@ -1648,6 +1743,8 @@
                     document.getElementById('fbWrong').innerText = '0';
                     document.getElementById('fbRemaining').innerText = '0';
                     document.getElementById('fbFeedbackIcon').innerHTML = '';
+                    document.getElementById('fbProgressBar').style.width = '0%';
+                    document.getElementById('fbProgressBar').style.background = '#FF8C00';
                 },
                 shouldConfetti
             );
@@ -1655,6 +1752,8 @@
             document.getElementById('fbAnswer').disabled = true;
             document.getElementById('fbCheckBtn').disabled = true;
             document.getElementById('fbQuestion').innerHTML = '?';
+            document.getElementById('fbProgressBar').style.width = '0%';
+            document.getElementById('fbProgressBar').style.background = '#FF8C00';
             return;
         }
         generateFBQuestion();
@@ -1870,6 +1969,19 @@
         buildChart();
     }
 
+    // ---------- BACK TO TOP ----------
+    const backToTopBtn = document.getElementById('backToTopBtn');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            backToTopBtn.style.display = 'block';
+        } else {
+            backToTopBtn.style.display = 'none';
+        }
+    });
+    backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
     // ---------- INIT & EVENT LISTENERS ----------
     document.addEventListener('DOMContentLoaded', () => {
         populateRangeSelect();
@@ -1877,6 +1989,9 @@
         populateFBQuestionSelect();
         updateRangeDisplay();
         buildChart();
+        
+        // Sound toggle
+        document.getElementById('soundToggleBtn').addEventListener('click', toggleSound);
         
         document.getElementById('applyRangeBtn').addEventListener('click', () => {
             applyGlobalRange();
@@ -1948,6 +2063,8 @@
                     document.getElementById('fbWrong').innerText = '0';
                     document.getElementById('fbRemaining').innerText = '0';
                     document.getElementById('fbFeedbackIcon').innerHTML = '';
+                    document.getElementById('fbProgressBar').style.width = '0%';
+                    document.getElementById('fbProgressBar').style.background = '#FF8C00';
                 }
                 if (tool === 'speeddrill') {
                     document.getElementById('drillQuestion').innerHTML = '--';
