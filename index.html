@@ -6,7 +6,7 @@
     <title>Multiplication Adventure – Online Math Game</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='70' fill='%23FF8C00'%3E⚡%3C/text%3E%3C/svg%3E">
     <style>
-        /* Copyright © 2025 [Your Name] – All rights reserved. */
+        /* © 2025 [Your Name] – All rights reserved. */
         * {
             box-sizing: border-box;
         }
@@ -573,7 +573,20 @@
             flex-wrap: wrap;
             margin-top: 20px;
         }
-        /* Confetti Canvas - overlays everything */
+        #modalShareBtn {
+            background: #2196F3;
+            color: white;
+        }
+        #modalShareBtn:hover {
+            background: #1976D2;
+            transform: scale(1.02);
+        }
+        .share-feedback {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #2E8B57;
+        }
+        /* Confetti Canvas */
         #confettiCanvas {
             position: fixed;
             top: 0;
@@ -789,6 +802,7 @@
             <button id="modalPlayAgainBtn">🎮 Play Again</button>
             <button id="modalMainMenuBtn">🏠 Main Menu</button>
             <button id="modalExitBtn">❌ Exit</button>
+            <button id="modalShareBtn">📋 Share Score</button>
         </div>
     </div>
 </div>
@@ -877,19 +891,16 @@
     }
 
     function triggerConfetti() {
-        // Clear any existing confetti
         confettiPieces = [];
         if (confettiAnimationId) {
             cancelAnimationFrame(confettiAnimationId);
             confettiAnimationId = null;
         }
         confettiActive = true;
-        // Spawn 200 pieces
         for (let i = 0; i < 200; i++) {
             confettiPieces.push(new ConfettiPiece());
         }
         animateConfetti();
-        // Auto-stop after 5 seconds
         setTimeout(() => {
             confettiActive = false;
             if (confettiAnimationId) {
@@ -916,6 +927,38 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             confettiActive = false;
         }
+    }
+
+    // ---------- SHARE SCORE FUNCTION ----------
+    function copyScoreToClipboard() {
+        const message = document.getElementById('modalMessage').innerText;
+        const cleanMessage = message
+            .replace(/<br>/g, '\n')
+            .replace(/<[^>]*>/g, '')
+            .trim();
+        const fullText = `📊 Multiplication Adventure Results\n\n${cleanMessage}\n\nPlay here: https://speedmathster.github.io/multiplication-adventure/`;
+        navigator.clipboard.writeText(fullText).then(() => {
+            const shareBtn = document.getElementById('modalShareBtn');
+            const originalText = shareBtn.textContent;
+            shareBtn.textContent = '✅ Copied!';
+            setTimeout(() => {
+                shareBtn.textContent = originalText;
+            }, 2000);
+        }).catch(() => {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = fullText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            const shareBtn = document.getElementById('modalShareBtn');
+            const originalText = shareBtn.textContent;
+            shareBtn.textContent = '✅ Copied!';
+            setTimeout(() => {
+                shareBtn.textContent = originalText;
+            }, 2000);
+        });
     }
 
     // Helper functions
@@ -1311,7 +1354,8 @@
         const playAgainBtn = document.getElementById('modalPlayAgainBtn');
         const mainMenuBtn = document.getElementById('modalMainMenuBtn');
         const exitBtn = document.getElementById('modalExitBtn');
-        
+        const shareBtn = document.getElementById('modalShareBtn');
+        // Remove old listeners and attach new ones
         const newPlayAgain = () => {
             modal.style.display = 'none';
             if (onPlayAgain) onPlayAgain();
@@ -1324,18 +1368,14 @@
             modal.style.display = 'none';
             if (onExit) onExit();
         };
-        
         playAgainBtn.replaceWith(playAgainBtn.cloneNode(true));
         mainMenuBtn.replaceWith(mainMenuBtn.cloneNode(true));
         exitBtn.replaceWith(exitBtn.cloneNode(true));
-        
-        const newPlayAgainBtn = document.getElementById('modalPlayAgainBtn');
-        const newMainMenuBtn = document.getElementById('modalMainMenuBtn');
-        const newExitBtn = document.getElementById('modalExitBtn');
-        
-        newPlayAgainBtn.addEventListener('click', newPlayAgain);
-        newMainMenuBtn.addEventListener('click', newMainMenu);
-        newExitBtn.addEventListener('click', newExit);
+        shareBtn.replaceWith(shareBtn.cloneNode(true));
+        document.getElementById('modalPlayAgainBtn').addEventListener('click', newPlayAgain);
+        document.getElementById('modalMainMenuBtn').addEventListener('click', newMainMenu);
+        document.getElementById('modalExitBtn').addEventListener('click', newExit);
+        document.getElementById('modalShareBtn').addEventListener('click', copyScoreToClipboard);
     }
 
     function endQuiz() {
